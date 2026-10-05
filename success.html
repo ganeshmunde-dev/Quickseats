@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickSeats — Booking Success</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=3.1">
+  <style>
+    .success-wrapper {
+      max-width: 800px;
+      margin: 3rem auto;
+      padding: 2rem;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .success-icon {
+      font-size: 4rem;
+      color: #10b981;
+      margin-bottom: 1rem;
+    }
+    .receipt-card {
+      text-align: left;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .receipt-row:last-child {
+      border-bottom: none;
+    }
+    .receipt-label {
+      color: #64748b;
+      font-weight: 500;
+    }
+    .receipt-value {
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn-secondary {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      padding: 0.875rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
+    }
+    
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .success-wrapper, .success-wrapper * {
+        visibility: visible;
+      }
+      .success-wrapper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+      .action-buttons, .navbar, .success-icon, h2, p {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <img src="assets/img/bus logo2.png" alt="QuickSeats Logo" class="nav-logo-img" style="height:36px;">
+      QuickSeats
+    </div>
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="my_bookings.html">My Bookings</a>
+      <a href="sso-login.php?role=admin">Admin</a>
+      <div id="nav-user-area"></div>
+    </div>
+  </nav>
+
+  <div class="success-wrapper">
+    <div class="success-icon">✓</div>
+    <h2>Booking Confirmed!</h2>
+    <p>Your payment was successful and your ticket has been booked.</p>
+
+    <div class="receipt-card" id="receipt-details">
+      <p style="text-align:center; color: #64748b;">Loading receipt details...</p>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn-primary-full" style="width: auto;" onclick="window.print()">🖨️ Print Ticket / Save PDF</button>
+      <button class="btn-secondary" onclick="window.location.href='my_bookings.html'">📅 My Bookings</button>
+      <button class="btn-secondary" onclick="window.location.href='home.html'">🏠 Return to Home</button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'api';
+
+    async function loadReceipt() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const bookingId = urlParams.get('id');
+
+      if (!bookingId) {
+        document.getElementById('receipt-details').innerHTML = '<p style="text-align:center; color: red;">Invalid Booking ID.</p>';
+        return;
+      }
+
+      try {
+        // Get email from URL param first, then localStorage
+        const email = urlParams.get('email') || localStorage.getItem('qs_user') || '';
+        const emailParam = email ? `&email=${encodeURIComponent(email)}` : '';
+        const res = await fetch(`${API_BASE}/get_single_booking.php?id=${bookingId}${emailParam}`);
+        const data = await res.json();
+
+        if (!res.ok || !data.success) throw new Error(data.error || 'Failed to load receipt.');
+
+        const b = data.booking;
+        const pnr = `QS${String(b.id).padStart(6,'0')}`;
+        const travelDate = new Date(b.travel_date).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+        document.getElementById('receipt-details').innerHTML = `
+          <div style="text-align:center; margin-bottom:1.5rem;">
+            <img src="assets/img/bus logo2.png" alt="QuickSeats" style="height:40px; margin-bottom:0.5rem;"><br>
+            <strong style="font-size:1.1rem;">QuickSeats e-Ticket</strong>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">PNR / Booking Ref</span>
+            <span class="receipt-value" style="color:#23254d; font-size:1.1rem;">${pnr}</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Passenger Name</span>
+            <span class="receipt-value">${b.passenger_name}</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Route</span>
+            <span class="receipt-value">${b.route_from} → ${b.route_to}</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Journey Date &amp; Time</span>
+            <span class="receipt-value">${travelDate} | ${b.travel_time}</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Bus Type</span>
+            <span class="receipt-value">${b.bus_type}</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Seats Booked</span>
+            <span class="receipt-value">${b.seats_booked}</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Total Fare</span>
+            <span class="receipt-value" style="color:#10b981; font-size:1.1rem;">₹${b.total_price}</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Payment Status</span>
+            <span class="receipt-value" style="color:#10b981;">✔ PAID</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Booking Date</span>
+            <span class="receipt-value">${new Date(b.booked_at).toLocaleString('en-IN')}</span>
+          </div>
+        `;
+      } catch (err) {
+        document.getElementById('receipt-details').innerHTML = `<p style="text-align:center; color: red;">${err.message}</p>`;
+      }
+    }
+
+    // Initialize User Area & load receipt
+    function updateUserUI() {
+      const user = localStorage.getItem('qs_user');
+      const desktopArea = document.getElementById('nav-user-area');
+      if (user) {
+        desktopArea.innerHTML = `<span style="color: white; margin-right: 1rem; font-size: 0.85rem;">👤 ${user}</span><button class="btn-secondary" style="padding: 0.4rem 1rem; border:none;" onclick="logoutUser()">Logout</button>`;
+      } else {
+        window.location.href = 'home.html';
+      }
+    }
+    
+    window.logoutUser = function() {
+      localStorage.removeItem('qs_user');
+      window.location.href = 'home.html';
+    };
+
+    updateUserUI();
+    loadReceipt();
+  </script>
+</body>
+</html>

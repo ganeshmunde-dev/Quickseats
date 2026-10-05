@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickSeats - Admin Dashboard</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=3.1">
+  <link rel="stylesheet" href="assets/css/admin.css?v=1.0">
+</head>
+<body>
+
+  <!-- Admin Header -->
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <div class="admin-brand">
+        <img src="assets/img/bus logo2.png" alt="QuickSeats Logo" class="admin-logo-img">
+        <span class="admin-brand-name">QuickSeats Admin</span>
+      </div>
+      <nav class="admin-header-nav">
+        <a href="home.html" class="admin-header-link">Home</a>
+        <a href="#" id="admin-logout-btn" class="admin-header-link admin-logout-link hidden">Log Out</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Login Section -->
+  <main class="admin-login-wrapper" id="admin-login-section">
+    <div class="admin-login-card">
+      <div class="admin-login-icon">🔐</div>
+      <h2 class="admin-login-title">Admin Access</h2>
+      <p class="admin-login-subtitle">Log in to manage routes and bookings</p>
+
+      <div style="margin-bottom: 20px; text-align: center;">
+        <a href="sso-login.php?role=admin" style="display: block; width: 100%; padding: 12px; background: linear-gradient(135deg, #2563eb, #06b6d4); color: white; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 14px; box-shadow: 0 4px 14px rgba(37,99,235,0.3);">
+          ⚡ 1-Click Demo Admin Login
+        </a>
+        <div style="margin: 15px 0 10px; font-size: 12px; color: #888;">— OR MANUAL LOGIN —</div>
+      </div>
+      <form id="admin-login-form" autocomplete="off">
+        <div class="admin-field-group">
+          <label class="admin-label" for="admin-username">Username</label>
+          <input type="text" id="admin-username" class="admin-input" placeholder="Enter username" required>
+        </div>
+        <div class="admin-field-group">
+          <label class="admin-label" for="admin-password">Password</label>
+          <input type="password" id="admin-password" class="admin-input" placeholder="Enter password" required>
+        </div>
+        <div id="admin-login-error" class="admin-error-box hidden"></div>
+        <button type="submit" class="admin-btn-login">Secure Login</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Dashboard Section -->
+  <div class="admin-dashboard hidden" id="admin-dashboard-section">
+
+    <!-- Admin Tab Navigation -->
+    <nav class="admin-tab-nav">
+      <div class="admin-tab-nav-inner">
+        <a href="#" class="admin-tab-link active" data-tab="overview">
+          <span class="tab-icon">📊</span> Overview
+        </a>
+        <a href="#" class="admin-tab-link" data-tab="routes">
+          <span class="tab-icon">🛣️</span> Manage Routes
+        </a>
+        <a href="#" class="admin-tab-link" data-tab="bookings">
+          <span class="tab-icon">🎟️</span> View Bookings
+        </a>
+      </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="admin-content-area">
+
+      <!-- Overview Tab -->
+      <div id="tab-overview" class="admin-tab-panel">
+        <h2 class="admin-section-title">Dashboard Overview</h2>
+        <div class="admin-stat-grid">
+          <div class="admin-stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <p class="stat-label">Total Revenue</p>
+              <p class="stat-value" id="stat-revenue">₹0</p>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="stat-icon">🎫</div>
+            <div class="stat-info">
+              <p class="stat-label">Tickets Sold</p>
+              <p class="stat-value" id="stat-tickets">0</p>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="stat-icon">🚌</div>
+            <div class="stat-info">
+              <p class="stat-label">Active Routes</p>
+              <p class="stat-value" id="stat-routes">0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage Routes Tab -->
+      <div id="tab-routes" class="admin-tab-panel hidden">
+        <h2 class="admin-section-title">Manage Routes</h2>
+
+        <!-- Add Route Card -->
+        <div class="admin-card">
+          <h3 class="admin-card-title">Add New Route</h3>
+          <div id="add-route-error" class="admin-error-box hidden"></div>
+          <div id="add-route-success" class="admin-success-box hidden"></div>
+
+          <form id="add-route-form">
+            <div class="admin-form-row">
+              <div class="admin-field-group">
+                <label class="admin-label" for="route-from">From</label>
+                <input type="text" id="route-from" class="admin-input" placeholder="e.g. Mumbai" required>
+              </div>
+              <div class="admin-field-group">
+                <label class="admin-label" for="route-to">To</label>
+                <input type="text" id="route-to" class="admin-input" placeholder="e.g. Pune" required>
+              </div>
+            </div>
+
+            <div class="admin-form-row">
+              <div class="admin-field-group">
+                <label class="admin-label" for="route-date">Date</label>
+                <input type="date" id="route-date" class="admin-input" required>
+              </div>
+              <div class="admin-field-group">
+                <label class="admin-label" for="route-time">Time</label>
+                <input type="time" id="route-time" class="admin-input" required>
+              </div>
+            </div>
+
+            <div class="admin-form-row">
+              <div class="admin-field-group">
+                <label class="admin-label" for="route-type">Bus Type</label>
+                <select id="route-type" class="admin-input">
+                  <option value="AC">AC</option>
+                  <option value="Non-AC">Non-AC</option>
+                  <option value="Sleeper">Sleeper</option>
+                </select>
+              </div>
+              <div class="admin-field-group">
+                <label class="admin-label" for="route-price">Price (₹)</label>
+                <input type="number" id="route-price" class="admin-input" placeholder="e.g. 450" min="1" required>
+              </div>
+            </div>
+
+            <div class="admin-form-row admin-form-row--single">
+              <div class="admin-field-group">
+                <label class="admin-label" for="route-seats">Total Seats</label>
+                <input type="number" id="route-seats" class="admin-input" value="30" min="1" required>
+              </div>
+            </div>
+
+            <div class="admin-form-actions">
+              <button type="submit" class="admin-btn-primary">
+                ➕ Add Route
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Existing Routes Card -->
+        <div class="admin-card">
+          <h3 class="admin-card-title">Existing Routes</h3>
+          <div id="admin-route-list" class="admin-list-area">
+            <p class="admin-placeholder">Loading routes...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- View Bookings Tab -->
+      <div id="tab-bookings" class="admin-tab-panel hidden">
+        <h2 class="admin-section-title">Recent Bookings</h2>
+        <div class="admin-card">
+          <div id="admin-booking-list" class="admin-list-area">
+            <p class="admin-placeholder">Loading bookings...</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.admin-content-area -->
+  </div><!-- /.admin-dashboard -->
+
+  <script src="assets/js/script.js?v=4.0"></script>
+  <script src="assets/js/admin.js?v=1.0"></script>
+<script src="/projects/ucdas-widget.js"></script>
+</body>
+</html>

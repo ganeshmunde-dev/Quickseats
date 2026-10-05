@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickSeats — Login / Sign Up</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=3.1">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: var(--bottom-bg);
+      margin: 0;
+      padding: 1rem;
+    }
+
+    .auth-container {
+      background-color: var(--modal-bg);
+      width: 100%;
+      max-width: 450px; /* 400-500px wide as requested */
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      text-align: center;
+    }
+
+    .auth-illustration {
+      width: 80px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .auth-illustration img {
+      width: 100%;
+      height: auto;
+    }
+
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--bottom-bg);
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .auth-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .auth-form label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-form input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background-color: var(--input-bg);
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      font-family: inherit;
+      margin-bottom: 1.25rem;
+      transition: box-shadow 0.2s;
+    }
+
+    .auth-form input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(90, 85, 210, 0.2);
+    }
+
+    .btn-auth {
+      width: 100%;
+      background-color: var(--primary);
+      color: var(--text-white);
+      border: none;
+      padding: 0.875rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-auth:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .btn-back {
+      display: inline-block;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <!-- Small bus illustration -->
+    <div class="auth-illustration">
+      <img src="assets/img/bus logo2.png" alt="Bus Logo">
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</div>
+      <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
+    </div>
+
+    <!-- Error/Success Message Box -->
+    <div id="auth-msg" class="modal-error hidden"></div>
+
+    <!-- Login Form -->
+    <form id="form-login" class="auth-form">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="you@example.com" required>
+      
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" required>
+      
+      <button type="submit" class="btn-auth">Log In to QuickSeats</button>
+    </form>
+
+    <!-- Sign Up Form -->
+    <form id="form-signup" class="auth-form hidden">
+      <label>Full Name</label>
+      <input type="text" id="signup-name" placeholder="John Doe" required>
+
+      <label>Email Address</label>
+      <input type="email" id="signup-email" placeholder="you@example.com" required>
+      
+      <label>Password</label>
+      <input type="password" id="signup-password" placeholder="Create a password" required minlength="6">
+      
+      <button type="submit" class="btn-auth">Create Account</button>
+    </form>
+
+    <a href="home.html" class="btn-back">← Back to Home</a>
+  </div>
+
+  <script src="assets/js/script.js?v=auth"></script>
+</body>
+</html>

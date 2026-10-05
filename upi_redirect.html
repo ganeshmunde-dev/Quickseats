@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhonePe/UPI Payment</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=3.1" />
+  <style>
+    body { background: linear-gradient(180deg, #f7fbff 0%, #eef6ff 100%); }
+    .pay-page { max-width: 720px; margin: 2.5rem auto; padding: 1.5rem; background: #ffffff; border-radius: 24px; box-shadow: 0 24px 60px rgba(15,23,42,0.12); }
+    .pay-header { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; }
+    .pay-icon { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; background: linear-gradient(135deg, #2563eb, #06b6d4); color: white; font-weight: 800; font-size: 1.25rem; }
+    .payment-card { background: #f8fbff; padding: 1.5rem; border-radius: 20px; border: 1px solid #dbeafe; }
+    .payment-row { margin: 1rem 0; }
+    .payment-label { margin: 0 0 0.35rem; color: #475569; font-size: 0.95rem; }
+    .payment-value { margin: 0; font-size: 1.25rem; font-weight: 700; color: #0f1724; }
+    .redirect-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 1.5rem; }
+    .status-text { margin-top: 1rem; color: #475569; font-size: 0.98rem; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="bg-video">
+    <source src="assets/media/bus video.mp4" type="video/mp4">
+  </video>
+  <header class="hero">
+    <div class="brand">
+      <div class="logo">U</div>
+      <div>
+        <h1>UPI Payment</h1>
+        <p>Open PhonePe/GPay and complete the payment.</p>
+      </div>
+    </div>
+  </header>
+  <main class="container">
+    <section class="pay-page">
+      <div class="pay-header">
+        <div class="pay-icon">UPI</div>
+        <div>
+          <h2>Complete your payment</h2>
+          <p class="text-note">The amount and UPI details are shown below.</p>
+        </div>
+      </div>
+      <div class="payment-card">
+        <div class="payment-row">
+          <p class="payment-label">Merchant UPI ID</p>
+          <p class="payment-value" id="upi-id">payments@bank</p>
+        </div>
+        <div class="payment-row">
+          <p class="payment-label">Amount</p>
+          <p class="payment-value" id="payment-amount">₹0.00</p>
+        </div>
+        <div class="payment-row">
+          <p class="payment-label">Payment URL</p>
+          <p class="payment-value" id="payment-uri" style="font-size:0.95rem;font-weight:400;word-break:break-all;">—</p>
+        </div>
+        <img id="qr-img" src="" alt="UPI QR code" style="width:100%;max-width:320px;margin:1rem auto;display:block;border-radius:18px;border:1px solid #dbeafe;" />
+      </div>
+      <div class="redirect-actions">
+        <a id="open-app" class="btn primary phonepe-btn hidden" href="#">📱 Open PhonePe</a>
+        <button id="copy-uri" class="btn secondary hidden" type="button">Copy UPI Link</button>
+        <button id="finish-payment" class="btn primary hidden" style="background-color: #10b981; border: none; color: white;">Complete Payment</button>
+        <a class="btn secondary" href="booking.html">Back to Booking</a>
+      </div>
+      <p id="status-text" class="status-text">If your UPI app does not open, copy the link or scan the QR code manually.</p>
+    </section>
+  </main>
+  <script>
+    function getParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name) || '';
+    }
+    const uri = getParam('uri');
+    const amount = getParam('amount');
+    const id = getParam('id');
+    const bookingId = getParam('booking_id');
+    const upiIdEl = document.getElementById('upi-id');
+    const amountEl = document.getElementById('payment-amount');
+    const uriEl = document.getElementById('payment-uri');
+    const qrImg = document.getElementById('qr-img');
+    const openApp = document.getElementById('open-app');
+    const copyUri = document.getElementById('copy-uri');
+    const finishPayment = document.getElementById('finish-payment');
+    const statusText = document.getElementById('status-text');
+
+    if (id) {
+      upiIdEl.textContent = decodeURIComponent(id);
+    }
+    if (amount) {
+      amountEl.textContent = '₹' + decodeURIComponent(amount);
+    }
+    if (uri) {
+      uriEl.textContent = uri;
+      qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(uri);
+      openApp.href = uri;
+      openApp.classList.remove('hidden');
+      copyUri.classList.remove('hidden');
+      
+      if (bookingId) {
+        finishPayment.classList.remove('hidden');
+        finishPayment.addEventListener('click', () => {
+          window.location.href = 'success.html?id=' + bookingId;
+        });
+      }
+
+      copyUri.addEventListener('click', () => {
+        navigator.clipboard.writeText(uri).then(() => {
+          statusText.textContent = 'UPI link copied. Open PhonePe/GPay and paste to pay.';
+        }).catch(() => {
+          statusText.textContent = 'Failed to copy automatically. Please copy the link manually.';
+        });
+      });
+    } else {
+      statusText.textContent = 'No UPI link available. Please return to the booking page and regenerate the QR.';
+    }
+  </script>
+</body>
+</html>

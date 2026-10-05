@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickSeats — India's No. 1 Bus Ticket Booking Site</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=3.1">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <img src="assets/img/bus logo2.png" alt="QuickSeats Logo" class="nav-logo-img" style="height:36px;">
+      QuickSeats
+    </div>
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="my_bookings.html">My Bookings</a>
+      <a href="sso-login.php?role=admin">Admin</a>
+      <div id="nav-user-area">
+        <!-- JS will inject user info or login button -->
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger-btn">☰</button>
+  </nav>
+  
+  <!-- MOBILE MENU -->
+  <div class="mobile-nav" id="mobile-menu">
+    <a href="home.html">Home</a>
+    <a href="my_bookings.html">My Bookings</a>
+    <a href="sso-login.php?role=admin">Admin</a>
+    <div id="mobile-user-area"></div>
+  </div>
+
+  <!-- HERO SECTION -->
+  <header class="hero">
+    <h1 class="animate-fade-up">India's No. 1 Bus Ticket Booking Site</h1>
+    <p class="animate-fade-up delay-100">Book your bus tickets online instantly. Choose from thousands of routes across the country.</p>
+  </header>
+
+  <!-- SEARCH FORM -->
+  <main>
+    <div class="search-container animate-fade-up delay-200">
+    <div class="form-group">
+      <label>From</label>
+      <select id="search-from" required>
+        <option value="">Leaving from...</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>To</label>
+      <select id="search-to" required>
+        <option value="">Going to...</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" id="search-date" required>
+    </div>
+    <button type="button" class="btn-search" id="btn-search">Search Buses</button>
+  </div>
+
+  <!-- FEATURES SECTION -->
+  <section class="features-section">
+    <h2>Why choose QuickSeats?</h2>
+    <p>Unbeatable prices, secure payments, and 24/7 customer support.</p>
+  </section>
+
+  </main>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="close-modal">&times;</button>
+      
+      <!-- STEP 1: Email Form -->
+      <div id="auth-step-email">
+        <h2 class="modal-title">Login / Sign Up</h2>
+        <p class="modal-subtitle">Enter your email to continue</p>
+        
+        <div id="email-error" class="modal-error hidden"></div>
+        <form id="email-form">
+          <input type="email" id="auth-email" class="modal-input" placeholder="Enter your email" required>
+          <button type="submit" class="btn-primary-full">Send OTP</button>
+        </form>
+      </div>
+
+      <!-- STEP 2: OTP Form -->
+      <div id="auth-step-otp" class="hidden">
+        <h2 class="modal-title">Verify Email</h2>
+        <p class="modal-subtitle">Enter the 4-digit OTP sent to your email</p>
+        
+        <div id="otp-error" class="modal-error hidden"></div>
+        <form id="otp-form">
+          <input type="text" id="auth-otp" class="modal-input" placeholder="1234" maxlength="4" pattern="\d{4}" required style="text-align:center; font-size: 1.2rem; letter-spacing: 0.5em;">
+          <button type="submit" class="btn-primary-full">Verify &amp; Continue</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/script.js?v=classic2"></script>
+<script src="/projects/ucdas-widget.js"></script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickSeats — Login & Sign Up</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=3.1">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: var(--top-bg); 
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+    }
+    .auth-container {
+      background-color: var(--modal-bg);
+      width: 100%;
+      max-width: 440px;
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      margin: 1rem;
+    }
+    .auth-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--top-bg);
+      margin-bottom: 2rem;
+    }
+    .auth-logo img { 
+      height: 36px; 
+      width: auto;
+    }
+    .text-center {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="auth-logo">
+      <img src="assets/img/bus logo2.png" alt="QuickSeats Logo" style="height:36px;">
+      QuickSeats
+    </div>
+
+    <!-- STEP 1: Email Form -->
+    <div id="auth-step-email">
+      <h2 class="modal-title text-center">Welcome!</h2>
+      <p class="modal-subtitle text-center">Enter your email to login or sign up</p>
+      
+      <div id="email-error" class="modal-error hidden"></div>
+      <form id="email-form">
+        <input type="email" id="auth-email" class="modal-input" placeholder="Enter your email" required>
+        <button type="submit" class="btn-primary-full">Send OTP</button>
+      </form>
+    </div>
+
+    <!-- STEP 2: OTP Form -->
+    <div id="auth-step-otp" class="hidden">
+      <h2 class="modal-title text-center">Verify Email</h2>
+      <p class="modal-subtitle text-center">Enter the 4-digit OTP sent to your email</p>
+      
+      <div id="otp-error" class="modal-error hidden"></div>
+      <form id="otp-form">
+        <input type="text" id="auth-otp" class="modal-input" placeholder="1234" maxlength="4" pattern="\d{4}" required style="text-align:center; font-size: 1.2rem; letter-spacing: 0.5em;">
+        <button type="submit" class="btn-primary-full">Verify &amp; Continue</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // If the user is already logged in, redirect them directly to home.html
+    if (localStorage.getItem('qs_user')) {
+      window.location.href = 'home.html';
+    }
+
+    const API_BASE = 'api';
+    const stepEmail = document.getElementById('auth-step-email');
+    const stepOtp = document.getElementById('auth-step-otp');
+
+    // Handle sending OTP
+    document.getElementById('email-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value;
+      const errorBox = document.getElementById('email-error');
+      const btn = e.target.querySelector('button');
+
+      errorBox.classList.add('hidden');
+      btn.textContent = 'Sending...'; 
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/send_otp.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || 'Failed to send OTP.');
+        
+        stepEmail.classList.add('hidden');
+        stepOtp.classList.remove('hidden');
+
+        if (data.otp) {
+          const otpInput = document.getElementById('auth-otp');
+          if (otpInput) otpInput.value = data.otp;
+        }
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.classList.remove('hidden');
+      } finally {
+        btn.textContent = 'Send OTP'; 
+        btn.disabled = false;
+      }
+    });
+
+    // Handle verifying OTP
+    document.getElementById('otp-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value;
+      const otp = document.getElementById('auth-otp').value;
+      const errorBox = document.getElementById('otp-error');
+      const btn = e.target.querySelector('button');
+
+      errorBox.classList.add('hidden');
+      btn.textContent = 'Verifying...'; 
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/verify_otp.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || 'Invalid OTP.');
+        
+        // Successful login: Store user and redirect to the main website
+        localStorage.setItem('qs_user', email);
+        window.location.href = 'home.html';
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.classList.remove('hidden');
+      } finally {
+        btn.textContent = 'Verify & Continue'; 
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

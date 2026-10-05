@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickSeats — Booking</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=3.1">
+  <style>
+    /* Additions specific to booking page in classic design */
+    .booking-wrapper {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .booking-wrapper { flex-direction: row; align-items: flex-start; }
+      .bus-list-col { flex: 2; }
+      .checkout-col { flex: 1; position: sticky; top: 100px; }
+    }
+
+    .bus-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .bus-card h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .bus-card p { font-size: 0.85rem; color: var(--text-muted); }
+    .bus-price { font-size: 1.5rem; font-weight: bold; color: var(--text-dark); }
+    
+    .seat-grid {
+      display: grid;
+      gap: 0.5rem;
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+    
+    .seat-row { display: flex; gap: 0.5rem; }
+    .seat-space { width: 30px; }
+    
+    .seat {
+      width: 40px; height: 40px;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 6px 6px 2px 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    
+    .seat:hover:not(.booked) { border-color: var(--primary); color: var(--primary); }
+    .seat.selected { background: var(--primary); border-color: var(--primary); color: white; }
+    .seat.booked { background: #e5e7eb; border-color: #d1d5db; color: #9ca3af; cursor: not-allowed; }
+
+    .checkout-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .checkout-row {
+      display: flex; justify-content: space-between;
+      margin-bottom: 0.75rem; font-size: 0.95rem;
+    }
+
+    .checkout-form label { display: block; font-size: 0.85rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.25rem; }
+    .checkout-form input, .checkout-form select {
+      width: 100%; padding: 0.75rem; border: 1px solid var(--border);
+      border-radius: 6px; font-family: inherit; font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <img src="assets/img/bus logo2.png" alt="QuickSeats Logo" class="nav-logo-img" style="height:36px;">
+      QuickSeats
+    </div>
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="my_bookings.html">My Bookings</a>
+      <a href="sso-login.php?role=admin">Admin</a>
+      <div id="nav-user-area"></div>
+    </div>
+    <button class="hamburger" id="hamburger-btn">☰</button>
+  </nav>
+
+  <div class="mobile-nav" id="mobile-menu">
+    <a href="home.html">Home</a>
+    <a href="my_bookings.html">My Bookings</a>
+    <a href="sso-login.php?role=admin">Admin</a>
+    <div id="mobile-user-area"></div>
+  </div>
+
+  <div class="booking-wrapper">
+    <div class="bus-list-col animate-fade-up">
+      <h2 style="margin-bottom: 1rem;">Available Buses</h2>
+      <div id="bus-list">
+        <div class="skeleton-box"></div>
+        <div class="skeleton-box" style="width: 80%"></div>
+        <div class="skeleton-box" style="width: 90%"></div>
+      </div>
+      
+      <div id="seat-selection" class="hidden">
+        <h3 style="margin-top: 2rem;">Select Seats</h3>
+        <div class="seat-grid" id="seat-grid-container"></div>
+      </div>
+    </div>
+
+    <div class="checkout-col animate-fade-up delay-100">
+      <div class="checkout-card">
+        <h3 style="margin-bottom: 1.5rem;">Booking Summary</h3>
+        <div id="checkout-empty">Select a bus and seats to begin.</div>
+        
+        <form id="checkout-form" class="checkout-form hidden">
+          <div class="checkout-row">
+            <span style="color: var(--text-muted)">Route</span>
+            <strong id="summary-route">—</strong>
+          </div>
+          <div class="checkout-row">
+            <span style="color: var(--text-muted)">Seats</span>
+            <strong id="summary-seats">—</strong>
+          </div>
+          <div class="checkout-row" style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+            <span>Total Price</span>
+            <strong style="color: var(--primary); font-size: 1.25rem;" id="summary-total">₹0</strong>
+          </div>
+          
+          <label>Passenger Name</label>
+          <input type="text" id="passenger-name" placeholder="John Doe" required>
+          
+          <label>Payment Method</label>
+          <select id="payment-method">
+            <option value="UPI">UPI / QR</option>
+            <option value="Card">Credit Card</option>
+          </select>
+          
+          <div id="login-warning" class="modal-error hidden" style="margin-top:1rem;">
+            Please <a href="#" id="trigger-login" style="text-decoration:underline; font-weight:bold; color:inherit;">Log In</a> to book a ticket.
+          </div>
+
+          <button type="submit" id="btn-book" class="btn-primary-full" style="margin-top: 1.5rem;">Pay &amp; Book Ticket</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="close-modal">&times;</button>
+      
+      <!-- STEP 1: Email Form -->
+      <div id="auth-step-email">
+        <h2 class="modal-title">Login / Sign Up</h2>
+        <p class="modal-subtitle">Enter your email to continue</p>
+        
+        <div id="email-error" class="modal-error hidden"></div>
+        <form id="email-form">
+          <input type="email" id="auth-email" class="modal-input" placeholder="Enter your email" required>
+          <button type="submit" class="btn-primary-full">Send OTP</button>
+        </form>
+      </div>
+
+      <!-- STEP 2: OTP Form -->
+      <div id="auth-step-otp" class="hidden">
+        <h2 class="modal-title">Verify Email</h2>
+        <p class="modal-subtitle">Enter the 4-digit OTP sent to your email</p>
+        
+        <div id="otp-error" class="modal-error hidden"></div>
+        <form id="otp-form">
+          <input type="text" id="auth-otp" class="modal-input" placeholder="1234" maxlength="4" pattern="\d{4}" required style="text-align:center; font-size: 1.2rem; letter-spacing: 0.5em;">
+          <button type="submit" class="btn-primary-full">Verify &amp; Continue</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/script.js?v=classic2"></script>
+</body>
+</html>
